@@ -9,5 +9,14 @@ namespace BlazorServerDb.Data
             : base(options)
         {
         }
+
+        public DbSet<WeatherForecast> WeatherForecasts { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);  // req for Identity
+
+        }
     }
 }
