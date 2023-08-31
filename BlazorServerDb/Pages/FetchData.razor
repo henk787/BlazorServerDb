@@ -1,5 +1,6 @@
 ﻿@page "/fetchdata"
 @using BlazorServerDb.Data
+@using System.Runtime.CompilerServices
 @inject WeatherForecastService ForecastService
 
 <PageTitle>Weather forecast</PageTitle>
@@ -7,6 +8,11 @@
 <h1>Weather forecast</h1>
 
 <p>This component demonstrates fetching data from a service.</p>
+
+<div>
+    <button disabled="@running" class="btn btn-primary ml-1" @onclick="DoTestRun">Click me</button> @statusMessage
+</div>
+
 
 @if (forecasts == null)
 {
@@ -42,9 +48,48 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateOnly.FromDateTime(DateTime.Now));
+        forecasts = await ForecastService.GetForecastAsync();
     }
 
+    bool running = false;
+    string statusMessage;
+
+    const int rounds = 100;  // x 100 x 5
+
+    private async Task DoTestRun()
+    {
+        running = true;
+
+        try
+        {
+            DateTime pollDate = DateTime.Now;
+            long addedInSession = 0;
+
+            for (int i = 1; i <= rounds; i++)
+            {
+                statusMessage = $"Round {i} of {rounds}, added {addedInSession:#,##0} records";
+                StateHasChanged();
+
+                for (int j = 0; j < 100; j++)  // x 5 records
+                {
+                    addedInSession += await ForecastService.AddForeCasts(pollDate);
+                }
+                pollDate.AddDays(-1);
+                forecasts = await ForecastService.GetForecastAsync();
+            }
+
+            long count = await ForecastService.CountForeCasts();
+            statusMessage = $"Database has {count:#,##0} records";
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            running = false;
+        }
+    }
 
 
 }
