@@ -1,5 +1,7 @@
 # BlazorServerDb
 
+Exercises a db from a Blazor App.
+
 Preparation:
 
 1. check the connectionstring in appsettings
