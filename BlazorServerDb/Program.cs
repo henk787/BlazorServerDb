@@ -23,6 +23,12 @@ builder.Services.AddTransient<WeatherForecastService>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    using var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
